@@ -1,14 +1,7 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
 
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
+const { query } = require('./db/index');
 
 /// Users
 
@@ -24,7 +17,7 @@ FROM users
 WHERE email = $1;
 `;
 const values = [email];
-return pool.query(queryString, values)
+return query(queryString, values)
 .then(res => res.rows[0]);
 }
 exports.getUserWithEmail = getUserWithEmail;
@@ -41,7 +34,7 @@ const getUserWithId = function(id) {
   WHERE id = $1;
   `;
   const values = [id];
-  return pool.query(queryString, values)
+  return query(queryString, values)
   .then(res => res.rows[0]);
 }
 exports.getUserWithId = getUserWithId;
@@ -59,7 +52,7 @@ VALUES ($1, $2, $3)
 RETURNING *;
 `;
 const userParams = [user.name, user.email, user.password];
-return pool.query(insertString, userParams)
+return query(insertString, userParams)
 .then(res => res.rows[0]);
 }
 exports.addUser = addUser;
@@ -83,7 +76,7 @@ ORDER BY reservations.start_date
 LIMIT $2;
 `;
 const values = [guest_id, limit];
-return pool.query(queryString, values)
+return query(queryString, values)
 .then(res => res.rows);
 }
 exports.getAllReservations = getAllReservations;
@@ -149,7 +142,7 @@ ORDER BY cost_per_night
 LIMIT $${queryParams.length};
 `;
 
- return pool.query(queryString, queryParams)
+ return query(queryString, queryParams)
  .then(res => res.rows);
 }
 exports.getAllProperties = getAllProperties;
@@ -196,7 +189,7 @@ const addProperty = function(property) {
     property.number_of_bathrooms,
     property.number_of_bedrooms];
 
-  return pool.query(insertString, values)
+  return query(insertString, values)
   .then(res => res.rows);
 }
 exports.addProperty = addProperty;
